@@ -1,0 +1,37 @@
+' {$STAMP BS2}
+' {PBASIC 2.5}
+
+Phase VAR OUTB
+
+StpsPerRev CON 200
+
+idx VAR Byte
+stpIdx VAR Nib
+stpDelay VAR Byte
+
+Steps  DATA %0011, %0110, %1100, %1001
+
+Setup:
+  DIRB = %1111
+  stpDelay = 2
+
+Main:
+  FOR idx = 1 TO StpsPerRev
+    ' GOSUB Step_Fwd
+    stpIdx = stpIdx + 1 // 4
+    READ (Steps + stpIdx), Phase
+    PAUSE stpDelay
+  NEXT
+
+  PAUSE 500
+
+  FOR idx = 1 TO StpsPerRev
+    ' GOSUB Step_Rev
+    stpIdx = stpIdx + 3 // 4
+    READ (Steps + stpIdx), Phase
+    PAUSE stpDelay
+  NEXT
+
+  PAUSE 500
+  GOTO Main
+  END

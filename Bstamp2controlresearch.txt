@@ -1,0 +1,82 @@
+connecting and programming NEMA 17-size hybrid unipolar/bipolar 200 steps/rev stepping motor to basic stamp 2 via ULN2003 transister array.
+
+basic stamps to ULN2003 connections:
+p4 to 1
+p5 to 2
+p6 to 3
+p7 to 4
+
+motor leads and connections to ULN2003:
+black = a (connected to 16)
+yellow = a' (common, connected to 12v+)
+green = c (connected to 14)
+red = b (connected to 15)
+white = b' (common, connected to 12v+)
+blue = d (connected to 13)
+
+ULN2003 pin layout:
+	 _______
+     p4 1|  u  |16 (Black)
+     p5 2|     |15 (red)
+     p6 3|     |14 (green)
+     p7 4|     |13 (blue)
+	5|     |12
+	6|     |11
+	7|     |10
+    VSS 8|     |9 COMMON
+
+----------------------------------------------------------------------------------------------
+Programming with PBasic 2.5:
+' {$STAMP BS2}
+' {$PBASIC 2.5}
+
+Phase VAR OUTB
+
+StpsPerRev CON 200
+
+idx VAR Byte
+stpIdx VAR Nib
+stpDelay VAR Byte
+
+Steps  DATA %0011, %0110, %1100, %1001
+
+Setup:
+  DIRB = %1111
+  stpDelay = 2
+
+Main:
+  FOR idx = 1 TO StpsPerRev
+    ' GOSUB Step_Fwd
+    stpIdx = stpIdx + 1 // 4
+    READ (Steps + stpIdx), Phase
+    PAUSE stpDelay
+  NEXT
+ 
+  PAUSE 500
+
+  FOR idx = 1 TO StpsPerRev
+    ' GOSUB Step_Rev
+    stpIdx = stpIdx + 3 // 4
+    READ (Steps + stpIdx), Phase
+    PAUSE stpDelay
+  NEXT
+
+  PAUSE 500
+  GOTO Main
+  END
+
+' Step_Fwd:
+'   stpIdx = stpIdx + 1 // 4
+'   GOTO Do_step
+
+' Step_Rev:
+'   stpIdx = stpIdx + 3 // 4
+'   GOTO Do_step
+
+' Do_step:
+'   READ (Steps + stpIdx), Phase
+'   PAUSE stpDelay
+'   RETURN
+
+
+	
